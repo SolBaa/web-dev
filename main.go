@@ -8,12 +8,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type User struct {
-	Name string
-}
+var homeTemplate *template.Template
 
 func main() {
+	var err error
+	homeTemplate, err = template.ParseFiles("views/home.gohtml")
 	r := mux.NewRouter()
+	if err != nil {
+		fmt.Println(err)
+	}
 	r.HandleFunc("/", hello)
 	http.ListenAndServe(":8080", r)
 }
@@ -21,14 +24,7 @@ func main() {
 func hello(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprint(w, "Holaaa")
 	w.Header().Set("Content-Type", "text/html")
-	t, err := template.ParseFiles("templates/index.gohtml")
-	if err != nil {
-		fmt.Println(err)
-	}
-	data := User{Name: "Sol"}
-
-	err = t.Execute(w, data)
-	if err != nil {
+	if err := homeTemplate.Execute(w, nil); err != nil {
 		fmt.Println(err)
 	}
 
